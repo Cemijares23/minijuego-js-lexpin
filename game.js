@@ -13,8 +13,10 @@ class Character {
   constructor(name, hp, atk, def) {
     this.name = name;
     this.hp = hp;
+    this.maxHp = hp;
     this.atk = atk;
     this.def = def;
+    this.uses = { heal: 2, defend: 2 };
   }
 
   // Method to select an attack based on weights. It sums the weights of all attacks, generates a random number, and if the random number is less than the weight of an attack, that attack is selected, otherwise it continues to the next attack.
@@ -43,6 +45,16 @@ class Character {
     this.hp -= damageTaken;
     if (this.hp < 0) this.hp = 0;
     return damageTaken;
+  }
+
+  heal() {
+    const amount = Math.min(
+      Math.floor(this.maxHp * 0.50),
+      this.maxHp - this.hp,
+    );
+    this.hp += amount;
+    this.uses.heal--;
+    return amount;
   }
 }
 
@@ -97,16 +109,23 @@ class Pirate extends Character {
 // Add await time with an async IIFE function
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const warrior1 = new Warrior("Warrior", Math.floor(Math.random() * (150 - 130) + 130), 20, 15);
+const warrior1 = new Warrior(
+  "Warrior",
+  Math.floor(Math.random() * (150 - 130) + 130),
+  20,
+  15,
+);
 const wizard1 = new Wizard("Wizard", 80, 30, 4);
 const archer1 = new Archer("Archer", 100, 24, 8);
 const pirate1 = new Pirate("Pirate", 120, 22, 10);
 
 let characters = [archer1, warrior1, wizard1, pirate1];
 
-console.log('Character Stats: ');
+console.log("Character Stats: ");
 for (let character of characters) {
-  console.log(`CLS \x1b[36m${character.name}\x1b[0m | HP \x1b[31m${character.hp}\x1b[0m | ATK \x1b[33m${character.atk}\x1b[0m | DEF \x1b[34m${character.def}\x1b[0m`)
+  console.log(
+    `CLS \x1b[36m${character.name}\x1b[0m | HP \x1b[31m${character.hp}\x1b[0m | ATK \x1b[33m${character.atk}\x1b[0m | DEF \x1b[34m${character.def}\x1b[0m`,
+  );
 }
 
 console.log("\nDeciding turns:");
@@ -145,7 +164,6 @@ let isBattleGoing = () => queueCharacters.length > 1;
 let round = 1;
 
 (async () => {
-
   // Start battle
   while (isBattleGoing()) {
     console.log(`\n\x1b[35m--- Round ${round} ---\x1b[0m`);
@@ -153,26 +171,39 @@ let round = 1;
     for (const character of queueCharacters) {
       if (character.hp <= 0) continue; // skipping dead characters
 
-      // Character selects an attack
-      const attack = character.selectAttack();
+      const hpRatio = character.hp / character.maxHp; // 1 = full HP, 0 = dead
+      const healChance = hpRatio < 0.25 ? 0.4 : 0.05; // under 50% -> 20%, otherwise 5%
 
-      // Determine random targets from the queue
-      const targets = queueCharacters
-        .filter((c) => c !== character)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, attack.targets);
+      const wantsToHeal =
+        character.uses.heal > 0 && // has heals left
+        character.hp < character.maxHp && // is actually hurt
+        Math.random() < healChance;
 
-      for (const target of targets) {
-        let inflictedDamage = character.inflictDamage(attack, target);
-
-        const result =
-          target.hp <= 0
-            ? `\x1b[31m${target.name} has fallen.\x1b[0m`
-            : `${target.name} has \x1b[32m${target.hp} HP\x1b[0m left.`;
-
+      if (wantsToHeal) {
+        const healed = character.heal();
         console.log(
-          `\x1b[36m${character.name}\x1b[0m uses ${attack.weight === 10 ? `\x1b[35m${attack.name}\x1b[0m` : attack.name} dealing \x1b[33m${inflictedDamage} damage\x1b[0m to ${target.name}. ${result}`,
+          `\x1b[36m${character.name}\x1b[0m heals \x1b[32m${healed} HP\x1b[0m (${character.hp}/${character.maxHp}). Heals left: ${character.uses.heal}`,
         );
+      } else {
+        const attack = character.selectAttack();
+
+        const targets = queueCharacters
+          .filter((c) => c !== character)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, attack.targets);
+
+        for (const target of targets) {
+          let inflictedDamage = character.inflictDamage(attack, target);
+
+          const result =
+            target.hp <= 0
+              ? `\x1b[31m${target.name} has fallen.\x1b[0m`
+              : `${target.name} has \x1b[32m${target.hp} HP\x1b[0m left.`;
+
+          console.log(
+            `\x1b[36m${character.name}\x1b[0m uses ${attack.weight === 10 ? `\x1b[35m${attack.name}\x1b[0m` : attack.name} dealing \x1b[33m${inflictedDamage} damage\x1b[0m to ${target.name}. ${result}`,
+          );
+        }
       }
 
       await sleep(1000);
@@ -185,7 +216,8 @@ let round = 1;
   }
 
   if (queueCharacters.length === 1) {
-  console.log(`\x1b[32m\n${queueCharacters[0].name} has won the battle!\x1b[0m`);
-}
+    console.log(
+      `\x1b[32m\n${queueCharacters[0].name} has won the battle!\x1b[0m`,
+    );
+  }
 })();
-
