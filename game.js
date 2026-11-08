@@ -48,10 +48,7 @@ class Character {
   }
 
   heal() {
-    const amount = Math.min(
-      Math.floor(this.maxHp * 0.50),
-      this.maxHp - this.hp,
-    );
+    const amount = Math.min(Math.floor(this.maxHp * 0.5), this.maxHp - this.hp);
     this.hp += amount;
     this.uses.heal--;
     return amount;
@@ -65,7 +62,7 @@ class Warrior extends Character {
       new Attack("Sword Slash", 1, 40, this.atk * 1),
       new Attack("Crushing Blow", 1, 30, this.atk * 1.33),
       new Attack("Shield Slam!", 1, 20, this.atk * 2),
-      new Attack("Earthquake!!", 3, 10, this.atk * 4),
+      new Attack("Earthquake!!", 3, 10, this.atk * 3),
     ];
   }
 }
@@ -77,7 +74,7 @@ class Archer extends Character {
       new Attack("Quick Shot", 1, 40, this.atk * 1),
       new Attack("Piercing Shot", 2, 30, this.atk * 1.33),
       new Attack("Sharp Aim!", 1, 20, this.atk * 2),
-      new Attack("Arrow Rain!!", 3, 10, this.atk * 4),
+      new Attack("Arrow Rain!!", 3, 10, this.atk * 3),
     ];
   }
 }
@@ -89,7 +86,7 @@ class Wizard extends Character {
       new Attack("Energy Bolt", 1, 40, this.atk * 1),
       new Attack("Meteor Storm", 3, 30, this.atk * 1.33),
       new Attack("Thunder Strike!", 1, 20, this.atk * 2),
-      new Attack("Icy Blast!!", 2, 10, this.atk * 4),
+      new Attack("Icy Blast!!", 2, 10, this.atk * 3),
     ];
   }
 }
@@ -101,7 +98,7 @@ class Pirate extends Character {
       new Attack("Blade Swipe", 1, 40, this.atk * 1),
       new Attack("Cannon Barrage", 2, 30, this.atk * 1.33),
       new Attack("Hook Swing!", 1, 20, this.atk * 2),
-      new Attack("Gunpowder Blast!!", 2, 10, this.atk * 4),
+      new Attack("Gunpowder Blast!!", 2, 10, this.atk * 3),
     ];
   }
 }
@@ -109,12 +106,7 @@ class Pirate extends Character {
 // Add await time with an async IIFE function
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const warrior1 = new Warrior(
-  "Warrior",
-  Math.floor(Math.random() * (150 - 130) + 130),
-  20,
-  15,
-);
+const warrior1 = new Warrior("Warrior", 130, 20, 15);
 const wizard1 = new Wizard("Wizard", 80, 30, 4);
 const archer1 = new Archer("Archer", 100, 24, 8);
 const pirate1 = new Pirate("Pirate", 120, 22, 10);
@@ -172,7 +164,7 @@ let round = 1;
       if (character.hp <= 0) continue; // skipping dead characters
 
       const hpRatio = character.hp / character.maxHp; // 1 = full HP, 0 = dead
-      const healChance = hpRatio < 0.25 ? 0.4 : 0.05; // under 50% -> 20%, otherwise 5%
+      const healChance = hpRatio < 0.25 ? 0.4 : 0.05; // under 50% -> 40%, otherwise 5%
 
       const wantsToHeal =
         character.uses.heal > 0 && // has heals left
