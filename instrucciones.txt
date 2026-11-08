@@ -1,0 +1,23 @@
+Mini Proyecto: Primera Sección de JS - Fundamentos de Programación
+
+Objetivo:
+Desarrollar un juego en JS que simule una batalla entre, al menos, 
+4 personajes al mismo tiempo con resultados aleatorios.
+
+Para ello, deberás crear una clase `Character` que represente a cada personaje, con propiedades como nombre, vida, ataque y defensa, y métodos para atacar y recibir daño.
+
+Esta clase funcionará como padre de otras clases que representen tipos específicos de personajes, como guerreros, magos o arqueros, cada uno con habilidades particulares.
+
+Cada habilidad deberá tener su propia formula de daño que se aplicará al atacar a otros personajes.
+
+Tras esto, deberás diseñar el flujo del juego utilizando todos los fundamentos básicos de la programación.
+1. Lo primero es instanciar los personajes que participarán en la batalla. Las estadísticas de cada uno deben generarse aleatoriamente entre dos límites definidos por el desarrollador.
+2. Una vez instanciados los personajes, se debe iniciar la batalla. Cada personaje atacará a otro de forma aleatoria con una habilidad de su repertorio, aplicando la fórmula de daño correspondiente. Ten cuidado que permitir que un personaje se ataque a sí mismo.
+3. La batalla continuará hasta que solo quede un personaje con vida. Al final, se debe mostrar el resultado de la batalla, indicando el ganador y el estado final de todos los personajes.
+
+Muestra un mensaje en cada iteración del flujo indicando:
+- Quién ataca a quién y con qué habilidad.
+- Cuánto daño se inflige.
+- El estado de vida de los personajes después del ataque.
+
+2026-11-06
